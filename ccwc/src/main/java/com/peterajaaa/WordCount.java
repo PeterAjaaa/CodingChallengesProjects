@@ -3,7 +3,10 @@ package com.peterajaaa;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -18,6 +21,9 @@ public class WordCount implements Callable<Integer> {
     @Option(names = "-l", description = "Print number of lines for the given file")
     boolean countLines;
 
+    @Option(names = "-w", description = "Print number of words for the given file")
+    boolean countWords;
+
     @Parameters(paramLabel = "<FILE>", description = "The target file to operate on", arity = "1")
     String fileToCount;
 
@@ -25,6 +31,7 @@ public class WordCount implements Callable<Integer> {
     public Integer call() throws Exception {
         Path pathToFile = Paths.get(fileToCount);
         String filename = pathToFile.getFileName().toString();
+        List<String> allLinesFromFile = Files.readAllLines(pathToFile);
         String templateOutput = "%d %s\n";
 
         if (!Files.exists(pathToFile)) {
@@ -45,13 +52,24 @@ public class WordCount implements Callable<Integer> {
         if (countBytes) {
             System.out.printf(templateOutput, Files.size(pathToFile), filename);
         } else if (countLines) {
-            System.out.printf(templateOutput, Files.readAllLines(pathToFile).size(), filename);
+            System.out.printf(templateOutput, allLinesFromFile.size(), filename);
+        } else if (countWords) {
+            AtomicInteger wordCount = new AtomicInteger(0);
+            allLinesFromFile.parallelStream()
+                    .map(String::trim)
+                    .map(str -> str.split("\\s+"))
+                    .flatMap(Arrays::stream)
+                    .filter(item -> !item.isBlank())
+                    .forEach(item -> {
+                        wordCount.incrementAndGet();
+                    });
+            System.out.printf(templateOutput, wordCount.get(), filename);
         }
         return 0;
     }
 
     public static void main(String[] args) {
-        args = new String[] { "-l", "test.txt" };
+        args = new String[] { "-w", "test.txt" };
         int exitCode = new CommandLine(new WordCount()).execute(args);
         System.exit(exitCode);
     }
