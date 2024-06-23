@@ -8,7 +8,7 @@ import picocli.CommandLine;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-public class FileSizeTest {
+public class WordCountTest {
 
     @Test
     public void testFileSize() {
