@@ -56,11 +56,10 @@ public class WordCount implements Callable<Integer> {
         } else if (countWords) {
             AtomicInteger wordCount = new AtomicInteger(0);
             allLinesFromFile.parallelStream()
-                    .map(String::trim)
                     .map(str -> str.split("\\s+"))
                     .flatMap(Arrays::stream)
                     .filter(item -> !item.isBlank())
-                    .forEach(item -> {
+                    .forEach(unused -> {
                         wordCount.incrementAndGet();
                     });
             System.out.printf(templateOutput, wordCount.get(), filename);
