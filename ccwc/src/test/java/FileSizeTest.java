@@ -65,4 +65,32 @@ public class FileSizeTest {
         Assertions.assertEquals(0, exitCode);
         Assertions.assertEquals("7145 test.txt", output.trim());
     }
+
+    @Test
+    public void testFileNumberOfWords() {
+        // Prepare a stream to capture the output from System.out
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+
+        // Save the original System.out
+        PrintStream originalOut = System.out;
+
+        // Assign the special stream to System.out
+        System.setOut(ps);
+
+        // Execute the command with the arguments
+        int exitCode = new CommandLine(new WordCount()).execute("-w", "test.txt");
+
+        // Flush the stream
+        ps.flush();
+
+        // Restore the original System.out
+        System.setOut(originalOut);
+
+        // Convert the captured output to a string
+        String output = baos.toString();
+
+        Assertions.assertEquals(0, exitCode);
+        Assertions.assertEquals("58164 test.txt", output.trim());
+    }
 }
