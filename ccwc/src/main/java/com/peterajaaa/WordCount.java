@@ -1,6 +1,8 @@
 package com.peterajaaa;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine;
@@ -21,33 +23,35 @@ public class WordCount implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        File file = new File(fileToCount);
+        Path pathToFile = Paths.get(fileToCount);
+        String filename = pathToFile.getFileName().toString();
+        String templateOutput = "%d %s\n";
 
-        if (!file.exists()) {
+        if (!Files.exists(pathToFile)) {
             System.err.println("File " + fileToCount + " does not exist");
             return 1;
         }
 
-        if (!file.canRead()) {
+        if (!Files.isReadable(pathToFile)) {
             System.err.println("File " + fileToCount + " cannot be read");
             return 1;
         }
 
-        if (!file.isFile()) {
+        if (!Files.isRegularFile(pathToFile)) {
             System.err.println("Path " + fileToCount + " is not a file");
             return 1;
         }
 
         if (countBytes) {
-            System.out.println(file.length());
+            System.out.printf(templateOutput, Files.size(pathToFile), filename);
         } else if (countLines) {
+            System.out.printf(templateOutput, Files.readAllLines(pathToFile).size(), filename);
         }
-
         return 0;
     }
 
     public static void main(String[] args) {
-        args = new String[] { "-c", "test.txt" };
+        args = new String[] { "-l", "test.txt" };
         int exitCode = new CommandLine(new WordCount()).execute(args);
         System.exit(exitCode);
     }
