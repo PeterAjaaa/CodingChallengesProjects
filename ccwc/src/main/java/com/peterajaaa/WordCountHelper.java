@@ -19,21 +19,18 @@ public class WordCountHelper {
         this.pathToFile = Paths.get(fileToCount);
 
         if (!Files.exists(pathToFile)) {
-            System.err.println("File " + fileToCount + " does not exist");
-            return;
+            throw new IllegalArgumentException("File does not exist");
         } else if (!Files.isRegularFile(pathToFile)) {
-            System.err.println("Path " + fileToCount + " is not a file");
-            return;
+            throw new IllegalArgumentException("Path is not a file!");
         } else if (!Files.isReadable(pathToFile)) {
-            System.err.println("File " + fileToCount + " cannot be read");
-            return;
+            throw new IllegalArgumentException("File cannot be read");
         }
 
         try {
             this.allLinesFromFile = Files.readAllLines(pathToFile);
         } catch (Exception e) {
             e.printStackTrace();
-            return;
+            throw new RuntimeException(e);
         }
     }
 
