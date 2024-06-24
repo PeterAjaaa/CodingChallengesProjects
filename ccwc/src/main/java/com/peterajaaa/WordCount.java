@@ -38,11 +38,11 @@ public class WordCount implements Callable<Integer> {
         final String templateOutput = "%d %s\n";
         final String noFlagTemplateOutput = "%d  %d %d %s\n";
         final String noFlagTemplateOutputPiped = "%d   %d  %d\n";
-        final WordCountHelper wordCountHelper = new WordCountHelper(fileToCount);
-        final WordCountHelper wordCountHelperStdin = new WordCountHelper();
 
-        if (fileToCount == null) {
+        if (fileToCount.isBlank()) {
             if (noFlagUsed) {
+                final WordCountHelper wordCountHelperStdin = new WordCountHelper();
+
                 long lineCount = wordCountHelperStdin.getLineCountStdin();
                 long wordCount = wordCountHelperStdin.getWordCountStdin();
                 long fileSize = wordCountHelperStdin.getSizeStdin();
@@ -50,6 +50,7 @@ public class WordCount implements Callable<Integer> {
             }
             return 0;
         } else {
+            final WordCountHelper wordCountHelper = new WordCountHelper(fileToCount);
             final String filename = wordCountHelper.getPathToFile().getFileName().toString();
 
             if (noFlagUsed) {
