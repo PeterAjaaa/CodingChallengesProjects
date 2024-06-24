@@ -38,75 +38,43 @@ public class WordCount implements Callable<Integer> {
         final String templateOutput = "%d %s\n";
         final String noFlagTemplateOutput = "%d  %d %d %s\n";
         final String noFlagTemplateOutputPiped = "%d   %d  %d\n";
+        final WordCountHelper wordCountHelper = new WordCountHelper(fileToCount);
+        final WordCountHelper wordCountHelperStdin = new WordCountHelper();
 
         if (fileToCount == null) {
-            String inputLine;
-            BufferedReader bufferedStdInputStreamReader = new BufferedReader(new InputStreamReader(System.in));
-
             if (noFlagUsed) {
-                long lineCount = bufferedStdInputStreamReader.lines()
-                        .count();
-                long wordCount = bufferedStdInputStreamReader.lines()
-                        .parallel()
-                        .flatMap(str -> Arrays.stream(str.split("\\s+")))
-                        .filter(item -> !item.isBlank())
-                        .count();
-                long bytesCount = 0;
-
-                while ((inputLine = bufferedStdInputStreamReader.readLine()) != null) {
-                    byte[] bytes = inputLine.getBytes(StandardCharsets.UTF_8);
-                    bytesCount += bytes.length;
-                    bytesCount += System.lineSeparator().getBytes(StandardCharsets.UTF_8).length;
-                }
-                System.out.printf(noFlagTemplateOutputPiped, lineCount, wordCount, bytesCount);
-
+                long lineCount = wordCountHelperStdin.getLineCountStdin();
+                long wordCount = wordCountHelperStdin.getWordCountStdin();
+                long fileSize = wordCountHelperStdin.getSizeStdin();
+                System.out.printf(noFlagTemplateOutputPiped, lineCount, wordCount, fileSize);
             }
             return 0;
         } else {
-            final Path pathToFile = Paths.get(fileToCount);
-            final String filename = pathToFile.getFileName().toString();
-            final List<String> allLinesFromFile = Files.readAllLines(pathToFile);
-
-            if (!Files.exists(pathToFile)) {
-                System.err.println("File " + fileToCount + " does not exist");
-                return 1;
-            } else if (!Files.isRegularFile(pathToFile)) {
-                System.err.println("Path " + fileToCount + " is not a file");
-                return 1;
-            } else if (!Files.isReadable(pathToFile)) {
-                System.err.println("File " + fileToCount + " cannot be read");
-                return 1;
-            }
+            final String filename = wordCountHelper.getPathToFile().getFileName().toString();
 
             if (noFlagUsed) {
-                long lineCount = allLinesFromFile.size();
-                long wordCount = allLinesFromFile.parallelStream()
-                        .flatMap(str -> Arrays.stream(str.split("\\s+")))
-                        .filter(item -> !item.isBlank())
-                        .count();
-                long bytesCount = Files.size(pathToFile);
-                System.out.printf(noFlagTemplateOutput, lineCount, wordCount, bytesCount, filename);
+                long lineCount = wordCountHelper.getLineCount(fileToCount);
+                long wordCount = wordCountHelper.getWordsCount(fileToCount);
+                long fileSize = wordCountHelper.getSize(filename);
+                System.out.printf(noFlagTemplateOutput, lineCount, wordCount, fileSize, filename);
             } else {
                 if (countBytes) {
-                    long bytesCount = Files.size(pathToFile);
-                    System.out.printf(templateOutput, bytesCount, filename);
+                    long fileSize = wordCountHelper.getSize(fileToCount);
+                    System.out.printf(templateOutput, fileSize, filename);
                 }
 
                 if (countLines) {
-                    long lineCount = allLinesFromFile.size();
+                    long lineCount = wordCountHelper.getLineCount(fileToCount);
                     System.out.printf(templateOutput, lineCount, filename);
                 }
 
                 if (countWords) {
-                    long wordCount = allLinesFromFile.parallelStream()
-                            .flatMap(str -> Arrays.stream(str.split("\\s+")))
-                            .filter(item -> !item.isBlank())
-                            .count();
+                    long wordCount = wordCountHelper.getWordsCount(fileToCount);
                     System.out.printf(templateOutput, wordCount, filename);
                 }
 
                 if (countChars) {
-                    long charCount = Files.readString(pathToFile).chars().count();
+                    long charCount = wordCountHelper.getCharsCount(fileToCount);
                     System.out.printf(templateOutput, charCount, filename);
                 }
             }
