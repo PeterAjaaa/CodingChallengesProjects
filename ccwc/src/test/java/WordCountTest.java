@@ -95,7 +95,7 @@ public class WordCountTest {
     }
 
     @Test
-    public void testNoArguments() {
+    public void testFileNumberOfChars() {
         // Prepare a stream to capture the output from System.out
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
@@ -123,7 +123,7 @@ public class WordCountTest {
     }
 
     @Test
-    public void testFileNumberOfChars() {
+    public void testNoArguments() {
         // Prepare a stream to capture the output from System.out
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
