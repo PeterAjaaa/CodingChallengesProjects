@@ -1,13 +1,5 @@
 package com.peterajaaa;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine;
@@ -41,9 +33,9 @@ public class WordCount implements Callable<Integer> {
 
         if (fileToCount.isBlank()) {
             if (noFlagUsed) {
-                final WordCountHelper wordCountHelperStdin = new WordCountHelper();
+                final WordCountHelperStdin wordCountHelperStdin = new WordCountHelperStdin();
 
-                long lineCount = wordCountHelperStdin.getLineCountStdin();
+                long lineCount = wordCountHelperStdin.getLineCount();
                 long wordCount = wordCountHelperStdin.getWordCountStdin();
                 long fileSize = wordCountHelperStdin.getSizeStdin();
                 System.out.printf(noFlagTemplateOutputPiped, lineCount, wordCount, fileSize);
@@ -84,7 +76,6 @@ public class WordCount implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        args = new String[] { "" };
         int exitCode = new CommandLine(new WordCount()).execute(args);
         System.exit(exitCode);
     }
