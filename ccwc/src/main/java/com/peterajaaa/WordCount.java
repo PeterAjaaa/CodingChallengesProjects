@@ -55,7 +55,7 @@ public class WordCount implements Callable<Integer> {
             if (noFlagUsed) {
                 long lineCount = wordCountHelper.getLineCount(fileToCount);
                 long wordCount = wordCountHelper.getWordsCount(fileToCount);
-                long fileSize = wordCountHelper.getSize(filename);
+                long fileSize = wordCountHelper.getSize(fileToCount);
                 System.out.printf(noFlagTemplateOutput, lineCount, wordCount, fileSize, filename);
             } else {
                 if (countBytes) {
