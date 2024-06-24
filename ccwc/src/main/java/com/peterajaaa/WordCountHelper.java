@@ -1,8 +1,5 @@
 package com.peterajaaa;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,10 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class WordCountHelper {
-    final Path pathToFile;
-    List<String> allLinesFromFile;
-    String inputLine;
-    BufferedReader bufferedStdInputStreamReader;
+    private final Path pathToFile;
+    private List<String> allLinesFromFile;
 
     public WordCountHelper(String fileToCount) {
         this.pathToFile = Paths.get(fileToCount);
@@ -34,21 +29,15 @@ public class WordCountHelper {
         }
     }
 
-    public WordCountHelper() {
-        this.pathToFile = null;
-        this.allLinesFromFile = null;
-        this.bufferedStdInputStreamReader = new BufferedReader(new InputStreamReader(System.in));
-    }
-
     public long getSize(String fileToCount) throws Exception {
         return Files.size(pathToFile);
     }
 
-    public long getLineCount(String fileToCount) throws Exception {
+    public long getLineCount(String fileToCount) {
         return allLinesFromFile.size();
     }
 
-    public long getWordsCount(String fileToCount) throws Exception {
+    public long getWordsCount(String fileToCount) {
         return allLinesFromFile.parallelStream()
                 .flatMap(str -> Arrays.stream(str.split("\\s+")))
                 .filter(item -> !item.isBlank())
@@ -57,32 +46,6 @@ public class WordCountHelper {
 
     public long getCharsCount(String fileToCount) throws Exception {
         return Files.readString(pathToFile).chars().count();
-    }
-
-    public long getLineCountStdin() {
-        return bufferedStdInputStreamReader.lines()
-                .count();
-    }
-
-    public long getWordCountStdin() {
-        return bufferedStdInputStreamReader.lines()
-                .parallel()
-                .flatMap(str -> Arrays.stream(str.split("\\s+")))
-                .filter(item -> !item.isBlank())
-                .count();
-    }
-
-    public long getSizeStdin() throws Exception {
-        long fileSize = 0;
-
-        while ((inputLine = bufferedStdInputStreamReader.readLine()) != null) {
-            byte[] bytes = inputLine.getBytes(StandardCharsets.UTF_8);
-            fileSize += bytes.length;
-            fileSize += System.lineSeparator().getBytes(StandardCharsets.UTF_8).length;
-        }
-
-        return fileSize;
-
     }
 
     public Path getPathToFile() {
