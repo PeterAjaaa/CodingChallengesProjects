@@ -156,6 +156,34 @@ public class WordCountTest {
     }
 
     @Test
+    public void testNoArgumentsEmptyFile() {
+        // Prepare a stream to capture the output from System.out
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+
+        // Save the original System.out
+        PrintStream originalOut = System.out;
+
+        // Assign the special stream to System.out
+        System.setOut(ps);
+
+        // Execute the command with the arguments
+        int exitCode = new CommandLine(new WordCount()).execute("test2.txt");
+
+        // Flush the stream
+        ps.flush();
+
+        // Restore the original System.out
+        System.setOut(originalOut);
+
+        // Convert the captured output to a string
+        String output = baos.toString();
+
+        Assertions.assertEquals(0, exitCode);
+        Assertions.assertEquals("0  0 0 test2.txt", output.trim());
+    }
+
+    @Test
     public void testFileNumberOfLinesStdin() throws Exception {
         // Prepare the content of test.txt as a String
         String fileContent = new String(Files.readAllBytes(Paths.get("test.txt")), StandardCharsets.UTF_8);
@@ -342,6 +370,45 @@ public class WordCountTest {
             Assertions.assertEquals(0, exitCode);
             // Update the expected output to match your program's output format
             Assertions.assertEquals("7145   58164  342190", output.trim());
+
+        } finally {
+            // Restore the original System.in and System.out
+            System.setIn(stdin);
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    public void testNoArgumentsStdinEmptyFile() throws Exception {
+        // Prepare the content of test.txt as a String
+        String fileContent = new String(Files.readAllBytes(Paths.get("test2.txt")), StandardCharsets.UTF_8);
+        InputStream stdin = System.in; // Save the original System.in
+        PrintStream originalOut = System.out; // Save the original System.out
+
+        try {
+            // Redirect System.in to read from the file content
+            System.setIn(new ByteArrayInputStream(fileContent.getBytes(StandardCharsets.UTF_8)));
+
+            // Prepare a stream to capture the output from System.out
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(baos);
+
+            // Assign the special stream to System.out
+            System.setOut(ps);
+
+            // Execute the command without the arguments to read from stdin
+            int exitCode = new CommandLine(new WordCount()).execute();
+
+            // Flush the stream
+            ps.flush();
+
+            // Convert the captured output to a string
+            String output = baos.toString();
+
+            // Assertions
+            Assertions.assertEquals(0, exitCode);
+            // Update the expected output to match your program's output format
+            Assertions.assertEquals("0   0  0", output.trim());
 
         } finally {
             // Restore the original System.in and System.out
