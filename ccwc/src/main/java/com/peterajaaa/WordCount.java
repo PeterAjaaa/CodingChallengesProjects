@@ -29,16 +29,36 @@ public class WordCount implements Callable<Integer> {
         final boolean noFlagUsed = !countBytes && !countLines && !countWords && !countChars;
         final String templateOutput = "%d %s\n";
         final String noFlagTemplateOutput = "%d  %d %d %s\n";
+        final String templateOutputPiped = "%d \n";
         final String noFlagTemplateOutputPiped = "%d   %d  %d\n";
 
-        if (fileToCount.isBlank()) {
+        if (fileToCount == null) {
+            final WordCountHelperStdin wordCountHelperStdin = new WordCountHelperStdin();
             if (noFlagUsed) {
-                final WordCountHelperStdin wordCountHelperStdin = new WordCountHelperStdin();
-
                 long lineCount = wordCountHelperStdin.getLineCount();
                 long wordCount = wordCountHelperStdin.getWordCountStdin();
                 long fileSize = wordCountHelperStdin.getSizeStdin();
                 System.out.printf(noFlagTemplateOutputPiped, lineCount, wordCount, fileSize);
+            } else {
+                if (countBytes) {
+                    long fileSize = wordCountHelperStdin.getSizeStdin();
+                    System.out.printf(templateOutputPiped, fileSize);
+                }
+
+                if (countLines) {
+                    long lineCount = wordCountHelperStdin.getLineCount();
+                    System.out.printf(templateOutputPiped, lineCount);
+                }
+
+                if (countWords) {
+                    long wordCount = wordCountHelperStdin.getWordCountStdin();
+                    System.out.printf(templateOutputPiped, wordCount);
+                }
+
+                if (countChars) {
+                    long charCount = wordCountHelperStdin.getCharsCountStdin();
+                    System.out.printf(templateOutputPiped, charCount);
+                }
             }
             return 0;
         } else {
