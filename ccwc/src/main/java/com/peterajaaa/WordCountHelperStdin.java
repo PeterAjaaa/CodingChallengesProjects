@@ -34,4 +34,8 @@ public class WordCountHelperStdin {
                 .count();
     }
 
+    public long getCharsCountStdin() {
+        return contentString.chars().count();
+    }
+
 }
